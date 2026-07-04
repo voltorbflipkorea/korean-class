@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한국어 퀴즈 7월 1주차</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-text-size-adjust: 100%; }
+  body {
+    background: #F6F8FA;
+    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    color: #2B3A55;
+    padding-bottom: 60px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; }
+
+  /* 배너 */
+  .banner { position: relative; background: #2B3A55; color: #fff; padding: 30px 20px 26px; overflow: hidden; }
+  .banner-grid { position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px);
+    background-size: 26px 26px; }
+  .banner-inner { position: relative; }
+  .eyebrow { display: inline-block; font-size: 12px; letter-spacing: .1em;
+    background: rgba(255,255,255,.14); padding: 4px 10px; border-radius: 999px; margin-bottom: 10px; }
+  .banner h1 { font-size: 26px; font-weight: 800; line-height: 1.3; }
+  .week-tag { display: inline-block; background: #FFD24C; color: #2B3A55; border-radius: 10px;
+    padding: 2px 12px; margin-left: 6px; font-size: 20px; transform: rotate(-2deg); }
+  .banner-sub { margin-top: 10px; font-size: 12px; color: rgba(255,255,255,.75); }
+  .stamp { position: absolute; right: 16px; top: 20px; width: 54px; height: 54px;
+    border: 2px solid rgba(255,255,255,.35); border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 12px; line-height: 1.15; text-align: center;
+    color: rgba(255,255,255,.55); transform: rotate(12deg); }
+
+  /* 컨트롤 */
+  .controls { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { border: 1.5px solid #D5DCE6; background: #fff; color: #2B3A55; border-radius: 999px;
+    padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .chip.on { background: #2B3A55; border-color: #2B3A55; color: #fff; }
+  .toolbar { display: flex; gap: 8px; }
+  .btn { border: none; border-radius: 12px; padding: 9px 15px; font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit; }
+  .btn-y { background: #FFD24C; color: #2B3A55; box-shadow: 0 2px 0 #E5B93A; }
+  .btn-y:active { transform: translateY(1px); box-shadow: 0 1px 0 #E5B93A; }
+  .btn-g { background: #EDF1F7; color: #2B3A55; }
+
+  .count { padding: 0 16px 4px; font-size: 12px; color: #7A8699; font-weight: 600; }
+
+  /* 문제 카드 */
+  .card { margin: 10px 16px; padding: 18px 16px 16px; background: #fff; border-radius: 18px;
+    box-shadow: 0 4px 16px rgba(43,58,85,.07); }
+  .card.hidden { display: none; }
+  .tag-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .set-tag { color: #fff; font-size: 12px; font-weight: 700; border-radius: 8px; padding: 4px 9px; }
+  .rule { font-size: 12px; color: #8A94A6; }
+  .qnum { margin-left: auto; font-size: 12px; color: #B4BCC9; font-weight: 700; }
+  .sentence { font-size: 17px; line-height: 1.75; margin-bottom: 16px; word-break: keep-all; }
+  .blank { display: inline-block; min-width: 56px; text-align: center; border-bottom: 2.5px solid #C7D0DD;
+    font-weight: 800; padding: 0 6px; color: #C7D0DD; }
+  .blank.filled { border-color: #2E8B57; color: #2E8B57; }
+  .opts { display: flex; flex-direction: column; gap: 9px; }
+  .opt { display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
+    border: 2px solid #E2E8F0; background: #FBFCFE; border-radius: 13px; padding: 12px 13px;
+    font-size: 16px; cursor: pointer; font-family: inherit; color: #2B3A55; }
+  .opt-mark { flex: none; width: 28px; height: 28px; border-radius: 8px; background: #EDF1F7;
+    color: #2B3A55; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .opt-text { font-weight: 600; }
+  .opt-badge { margin-left: auto; font-size: 12px; font-weight: 800; border-radius: 999px; padding: 3px 9px; display: none; }
+  .opt.correct { border-color: #2E8B57; background: #EDFAF2; }
+  .opt.correct .opt-mark { background: #2E8B57; color: #fff; }
+  .opt.correct .opt-badge { display: inline; color: #2E8B57; background: #DDF3E6; }
+  .opt.wrong { border-color: #C0392B; background: #FDF0EE; }
+  .opt.wrong .opt-mark { background: #C0392B; color: #fff; }
+  .opt.wrong .opt-badge { display: inline; color: #C0392B; background: #FADBD6; }
+  .opt.dim { opacity: .45; }
+  .explain { margin-top: 12px; background: #F3F6FB; border-radius: 11px; padding: 11px 13px;
+    font-size: 14px; line-height: 1.6; color: #44506A; display: none; }
+  .explain.show { display: block; }
+  .explain b { color: #2E8B57; }
+  .explain.bad b { color: #C0392B; }
+
+  footer { text-align: center; font-size: 12px; color: #A5AEBD; margin-top: 20px; padding: 0 16px; line-height: 1.6; }
+  .note { max-width: 640px; margin: 14px auto 0; padding: 0 16px; }
+  .note-box { background: #FFF6DA; border: 1px solid #F2E2A8; border-radius: 12px; padding: 10px 12px;
+    font-size: 12px; color: #7A6A2E; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="banner">
+    <div class="banner-grid"></div>
+    <div class="banner-inner">
+      <span class="eyebrow">고려대 한국어 · 문법 복습</span>
+      <h1>한국어 퀴즈 <span class="week-tag">7월 1주차</span></h1>
+      <p class="banner-sub">-던데 · -는다면 · -을 테니까 · -을 텐데 · -는다고요? · -(으)면</p>
+    </div>
+    <div class="stamp">받침<br>○</div>
+  </header>
+
+  <div class="controls">
+    <div class="chips" id="chips"></div>
+    <div class="toolbar">
+      <button class="btn btn-y" id="shuffleBtn">🔀 다시 섞기</button>
+      <button class="btn btn-g" id="resetBtn">↺ 답 지우기</button>
+    </div>
+  </div>
+
+  <div class="count" id="count"></div>
+
+  <main id="stage"></main>
+
+  <footer>보기(ㄱ/ㄴ)와 문제 순서는 열 때마다·다시 섞기마다 랜덤이에요<br>다음 주차 추가 예정</footer>
+</div>
+
+<script>
+var WEEKS = [{
+  id:"2026-07-w1", label:"7월 1주차",
+  sets:[
+    { id:"deonde-bg", name:"-던데 · 배경", color:"#3D9DB3", rule:"과거에 직접 경험한 것이 뒤 내용의 배경·상황이 될 때", items:[
+      { a:"아까 보니까 전공과 다른 일을 하는 사람도 ", b:" 그런 분들께 조언을 구해 보세요.", correct:"많던데", wrong:"많을 텐데", why:"'보니까'=직접 경험이므로 추측(텐데)이 아니라 -던데." },
+      { a:"어제 가 보니까 그 식당 새 메뉴가 ", b:" 내일 같이 가 볼래요?", correct:"괜찮던데", wrong:"괜찮다면", why:"직접 먹어 본 경험이 제안의 배경. 가정(다면)은 '가 보니까'와 충돌." },
+      { a:"방금 확인해 보니까 그 책이 서점에 ", b:" 필요하면 사다 줄까요?", correct:"있던데", wrong:"있으면", why:"이미 확인한 사실이므로 조건(으면)이 아니라 관찰 배경 -던데." },
+      { a:"지난번에 들어 보니까 김 대리가 이 분야를 잘 ", b:" 한번 물어보세요.", correct:"알던데", wrong:"안다고", why:"직접 들어 본 경험을 배경으로 제안. 인용(다고)은 문맥 불성립." },
+      { a:"아까 지나오다 보니까 옆 가게에서 세일을 ", b:" 시간 되면 가 봐요.", correct:"하던데", wrong:"할 테니까", why:"직접 본 사실. 테니까(추측 근거/의지)는 '보니까'와 충돌." },
+      { a:"어제 만나 보니까 그 사람 성격이 ", b:" 한번 사귀어 보는 게 어때요?", correct:"좋던데", wrong:"좋을 텐데", why:"만나 본 경험이 배경. 텐데는 아직 모를 때의 추측." },
+      { a:"아까 들어 보니까 발표 내용이 꽤 ", b:" 미리 예습해 두세요.", correct:"어렵던데", wrong:"어려우면", why:"이미 들어 본 사실이므로 조건이 아닌 배경." },
+      { a:"방금 창밖을 보니까 눈이 ", b:" 나갈 때 조심하세요.", correct:"오던데", wrong:"올 테니까", why:"직접 본 현재 상황. 추측 근거(테니까) 불필요." },
+      { a:"어제 시장에 가 보니까 과일이 많이 ", b:" 오늘 좀 사 올까요?", correct:"싸던데", wrong:"싸다면", why:"확인한 사실을 배경으로 제안." },
+      { a:"아까 교실에 들러 보니까 자리가 ", b:" 지금 가면 앉을 수 있을 거예요.", correct:"남던데", wrong:"남으면", why:"직접 본 상황이 근거." }
+    ]},
+    { id:"deonde-vs", name:"-던데 · 대립", color:"#5B8DEF", rule:"직접 경험한 것과 대립되는 내용이 뒤에 올 때", items:[
+      { a:"나는 이거 진짜 ", b:" 다른 사람들은 다들 좋아하더라고요.", correct:"맛없던데", wrong:"맛없다면", why:"내 경험 ↔ 남들 반응의 대립. 가정이 아님." },
+      { a:"나는 그 영화가 너무 ", b:" 친구는 최고라고 하더라고요.", correct:"지루하던데", wrong:"지루할 테니까", why:"이미 본 경험이므로 추측 불가." },
+      { a:"나는 처음엔 좀 ", b:" 너는 금방 편해졌나 봐.", correct:"어색하던데", wrong:"어색하다면", why:"과거 내 느낌 ↔ 상대의 대립." },
+      { a:"나한테는 그 옷이 잘 ", b:" 너는 별로라고 하네.", correct:"어울리던데", wrong:"어울리면", why:"직접 입어 본 느낌 ↔ 상대 의견 대립." },
+      { a:"내가 먹었을 때는 국이 좀 ", b:" 남편은 딱 맞다고 해요.", correct:"짜던데", wrong:"짜다고", why:"내 경험과 대립. 인용(다고)은 불성립." },
+      { a:"나는 그 노래가 참 ", b:" 요즘 사람들은 별로 안 듣더라.", correct:"좋던데", wrong:"좋으면", why:"느낀 것 ↔ 세상 반응의 대립." },
+      { a:"나는 그 사람 첫인상이 별로 ", b:" 만나 보니 정말 친절했어요.", correct:"안 좋던데", wrong:"안 좋으면", why:"과거 인상 ↔ 실제의 대립." },
+      { a:"나는 그 문제가 어렵게 ", b:" 친구들은 쉬웠대요.", correct:"느껴지던데", wrong:"느껴진다면", why:"실제 느낀 것이므로 가정 불가." },
+      { a:"내 눈에는 색깔이 파랗게 ", b:" 언니는 초록색이라고 해요.", correct:"보이던데", wrong:"보일 테니까", why:"직접 본 것 ↔ 언니 의견 대립." },
+      { a:"나는 그 식당이 좀 ", b:" 너는 싸다고 생각하는구나.", correct:"비싸던데", wrong:"비싸다면", why:"경험 ↔ 상대 생각의 대립." }
+    ]},
+    { id:"ndamyeon", name:"-는다면", color:"#7C6FE0", rule:"가능성이 적거나 사실이 아닌 것을 가정할 때", items:[
+      { a:"내일 눈이 ", b:" 내가 너한테 100만 원 줄게.", correct:"온다면", wrong:"올 테니까", why:"가능성 낮은 가정+과장된 약속 → -는다면." },
+      { a:"내가 ", b:" 노란색을 살 것 같아.", correct:"너라면", wrong:"너이던데", why:"'내가 너'는 사실이 아닌 가정. 명사+라면." },
+      { a:"자신의 선택을 믿고 ", b:" 분명히 목표를 이룰 수 있어요.", correct:"노력한다면", wrong:"노력한다고", why:"조건 가정. 인용은 불성립." },
+      { a:"만약 복권에 ", b:" 세계 여행을 떠나고 싶어요.", correct:"당첨된다면", wrong:"당첨될 텐데", why:"'만약'+가능성 낮은 가정." },
+      { a:"네가 그때 조금만 더 ", b:" 우리는 만날 수 있었을 거야.", correct:"기다렸다면", wrong:"기다리던데", why:"과거 사실과 반대되는 가정(-았다면)." },
+      { a:"시간을 되돌릴 수 ", b:" 다시 그날로 가고 싶어요.", correct:"있다면", wrong:"있을 테니까", why:"불가능한 일의 가정." },
+      { a:"이 세상에 마법이 ", b:" 무엇을 가장 하고 싶어요?", correct:"존재한다면", wrong:"존재하던데", why:"사실이 아닌 것의 가정." },
+      { a:"네가 원하는 게 ", b:" 내가 도와줄게.", correct:"그거라면", wrong:"그거라고", why:"명사(받침×)+라면." },
+      { a:"우리가 조금만 더 ", b:" 기차를 놓치지 않았을 거야.", correct:"부지런했다면", wrong:"부지런하던데", why:"과거 반대 가정." },
+      { a:"지금 당장 부자가 ", b:" 제일 먼저 뭘 하고 싶어요?", correct:"된다면", wrong:"될 텐데", why:"비현실적 가정 질문." }
+    ]},
+    { id:"tenikka", name:"-을 테니까", color:"#E08A3C", rule:"의지·추측 근거 → 뒤에 명령·청유가 옴", items:[
+      { a:"오늘 회의 준비는 제가 ", b:" 대리님은 급한 일부터 하세요.", correct:"할 테니까", wrong:"할 텐데", why:"나의 의지+뒤에 명령 → 테니까. 텐데는 의지 표현 불가." },
+      { a:"설거지는 제가 ", b:" 형은 좀 쉬어요.", correct:"할 테니까", wrong:"한다고", why:"의지+청유." },
+      { a:"제가 앞에서 ", b:" 저만 따라오세요.", correct:"안내할 테니까", wrong:"안내할 텐데", why:"의지+명령." },
+      { a:"이건 제가 대신 ", b:" 걱정하지 마세요.", correct:"전해 줄 테니까", wrong:"전해 줄 텐데", why:"의지+안심시키는 명령." },
+      { a:"곧 버스가 ", b:" 조금만 더 기다려 봐요.", correct:"올 테니까", wrong:"온다고", why:"추측 근거+청유." },
+      { a:"발표는 제가 ", b:" 너는 자료만 준비해.", correct:"맡을 테니까", wrong:"맡을 텐데", why:"의지+명령." },
+      { a:"내일은 제가 일찍 ", b:" 걱정 말고 먼저 가 계세요.", correct:"도착할 테니까", wrong:"도착할 텐데", why:"의지+명령." },
+      { a:"이 문제는 제가 ", b:" 너는 다음 문제를 봐.", correct:"풀 테니까", wrong:"푼다고", why:"의지+명령." },
+      { a:"제가 문을 ", b:" 먼저 퇴근하세요.", correct:"잠글 테니까", wrong:"잠글 텐데", why:"의지+명령." },
+      { a:"우리가 ", b:" 너무 부담 갖지 마.", correct:"도와줄 테니까", wrong:"도와주던데", why:"의지+명령. 던데는 미래 의지에 못 씀." }
+    ]},
+    { id:"tende", name:"-을 텐데", color:"#D45D79", rule:"추측 → 뒤에 걱정·의문·대립이 옴", items:[
+      { a:"여기까지 오느라 ", b:" 얼굴이 안 좋아 보여요.", correct:"고생했을 텐데", wrong:"고생했을 테니까", why:"추측+걱정 평서문 → 텐데. 테니까는 뒤에 명령 필요." },
+      { a:"이번 달까지 ", b:" 아직 반도 못 했어요.", correct:"끝내야 할 텐데", wrong:"끝내야 할 테니까", why:"추측+걱정." },
+      { a:"지금쯤 집에 ", b:" 왜 전화를 안 받지?", correct:"도착했을 텐데", wrong:"도착했을 테니까", why:"추측+의문." },
+      { a:"아이 혼자 있으면 ", b:" 괜찮을지 걱정이에요.", correct:"무서울 텐데", wrong:"무서울 테니까", why:"추측+걱정." },
+      { a:"배가 많이 ", b:" 왜 아무것도 안 먹었어요?", correct:"고팠을 텐데", wrong:"고팠을 테니까", why:"추측+의문." },
+      { a:"그 옷은 너한테 좀 ", b:" 생각보다 잘 맞네.", correct:"클 텐데", wrong:"클 테니까", why:"추측+대립(잘 맞네)." },
+      { a:"지금 가면 길이 ", b:" 벌써 출발했더라고요.", correct:"막힐 텐데", wrong:"막힐 테니까", why:"추측+걱정 섞인 대립." },
+      { a:"그 사람도 많이 ", b:" 내색도 안 했네요.", correct:"아팠을 텐데", wrong:"아팠을 테니까", why:"추측+대립." },
+      { a:"이 시간이면 은행 문을 ", b:" 어떡하죠?", correct:"닫았을 텐데", wrong:"닫았을 테니까", why:"추측+걱정 의문." },
+      { a:"날씨가 좋으면 경치가 ", b:" 오늘은 안개가 꼈네요.", correct:"아름다울 텐데", wrong:"아름다울 테니까", why:"추측+현실 대립." }
+    ]},
+    { id:"ndago", name:"-는다고요?", color:"#4CAF7D", rule:"들은 내용을 되묻거나 놀랐을 때", items:[
+      { a:"거기를 또 ", b:"? 어제도 갔잖아.", correct:"간다고", wrong:"갈 텐데", why:"들은 말 되묻기." },
+      { a:"다음 주에 ", b:"? 너무 갑작스러운데요.", correct:"이사한다고요", wrong:"이사할 테니까요", why:"확인+놀람." },
+      { a:"방금 시험에 ", b:"? 정말 축하해!", correct:"합격했다고", wrong:"합격했다면", why:"들은 소식 되묻기. 가정 아님." },
+      { a:"그 비싼 걸 혼자 다 ", b:"? 놀랍네요.", correct:"샀다고요", wrong:"살 텐데요", why:"놀라며 확인." },
+      { a:"저 두 사람이 ", b:"? 처음 듣는 얘기예요.", correct:"결혼한다고요", wrong:"결혼할 테니까요", why:"처음 듣고 되묻기." },
+      { a:"이 늦은 시간에 라면을 ", b:"? 살찐다니까.", correct:"먹는다고", wrong:"먹던데", why:"상대 말 되묻기. 동사 받침○ → -는다고." },
+      { a:"내일 학교에 안 ", b:"? 무슨 일 있어요?", correct:"온다고요", wrong:"올 테니까요", why:"확인 질문." },
+      { a:"그 영화가 그렇게 ", b:"? 나도 봐야겠다.", correct:"재미있다고", wrong:"재미있다면", why:"들은 말 되묻기. 형용사 → -다고." },
+      { a:"하루 만에 그 일을 다 ", b:"? 대단하다!", correct:"끝냈다고", wrong:"끝낼 테니까", why:"놀라며 확인." },
+      { a:"우리 팀이 ", b:"? 믿기지 않아요!", correct:"이겼다고요", wrong:"이기던데요", why:"믿기지 않아 되묻기." }
+    ]},
+    { id:"myeon-vs", name:"-(으)면 vs -는다면", color:"#8A7B5C", rule:"현실 조건 → -(으)면 · 비현실 가정 → -는다면", items:[
+      { a:"내일 비가 ", b:" 소풍은 취소예요.", correct:"오면", wrong:"온다면", why:"충분히 일어날 현실 조건+일상적 결과." },
+      { a:"만약 내가 다시 ", b:" 새처럼 하늘을 날고 싶어요.", correct:"태어난다면", wrong:"태어나면", why:"환생=비현실 가정." },
+      { a:"물은 100도가 ", b:" 끓기 시작해요.", correct:"되면", wrong:"된다면", why:"항상 참인 과학적 사실." },
+      { a:"이 세상에 전쟁이 ", b:" 얼마나 좋을까요?", correct:"없다면", wrong:"없으면", why:"현실과 다른 소망의 가정." },
+      { a:"버스를 ", b:" 다음 차를 타면 돼요.", correct:"놓치면", wrong:"놓친다면", why:"일상적 조건+평범한 해결." },
+      { a:"지금 ", b:" 막차를 탈 수 있어요.", correct:"출발하면", wrong:"출발한다면", why:"현실 조건." },
+      { a:"만약 복권에 ", b:" 회사를 그만두고 세계 여행을 다닐 거예요.", correct:"당첨된다면", wrong:"당첨되면", why:"'만약'+가능성 낮은 가정+과장된 계획." },
+      { a:"날씨가 ", b:" 에어컨을 켜세요.", correct:"더우면", wrong:"덥다면", why:"일상 조건+명령." },
+      { a:"만약 하늘에서 돈이 ", b:" 제일 먼저 뭘 하고 싶어요?", correct:"떨어진다면", wrong:"떨어지면", why:"비현실적 상상." },
+      { a:"이 버튼을 ", b:" 불이 켜져요.", correct:"누르면", wrong:"누른다면", why:"항상 참인 인과." }
+    ]}
+  ]
+}];
+
+var week = WEEKS[0];
+var MARKS = ["ㄱ","ㄴ"];
+var setFilter = "all";
+var deck = [];
+
+function shuffle(arr){ var a=arr.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function buildDeck(){
+  var pool=[];
+  for(var si=0; si<week.sets.length; si++){
+    var set=week.sets[si];
+    if(setFilter!=="all" && set.id!==setFilter) continue;
+    for(var ii=0; ii<set.items.length; ii++){
+      var it=set.items[ii];
+      var correctFirst=Math.random()<0.5;
+      pool.push({
+        setName:set.name, color:set.color, rule:set.rule,
+        a:it.a, b:it.b, why:it.why,
+        options: correctFirst ? [it.correct,it.wrong] : [it.wrong,it.correct],
+        answerIdx: correctFirst ? 0 : 1
+      });
+    }
+  }
+  return shuffle(pool);
+}
+
+function renderChips(){
+  var total=0; for(var i=0;i<week.sets.length;i++){ total+=week.sets[i].items.length; }
+  var html='<button class="chip'+(setFilter==="all"?" on":"")+'" data-f="all">전체 '+total+'</button>';
+  for(var j=0;j<week.sets.length;j++){
+    var s=week.sets[j];
+    var on=setFilter===s.id;
+    html+='<button class="chip'+(on?" on":"")+'" data-f="'+s.id+'" style="'+(on?"background:"+s.color+";border-color:"+s.color+";color:#fff;":"")+'">'+esc(s.name)+'</button>';
+  }
+  document.getElementById("chips").innerHTML=html;
+  var btns=document.getElementById("chips").getElementsByTagName("button");
+  for(var k=0;k<btns.length;k++){
+    btns[k].onclick=function(){ setFilter=this.getAttribute("data-f"); render(); };
+  }
+}
+
+function render(){
+  deck=buildDeck();
+  renderChips();
+  document.getElementById("count").textContent="총 "+deck.length+"문제 · 하나씩 골라 보세요";
+  var html="";
+  for(var i=0;i<deck.length;i++){
+    var q=deck[i];
+    html+='<section class="card" data-ans="'+q.answerIdx+'">';
+    html+='<div class="tag-row"><span class="set-tag" style="background:'+q.color+'">'+esc(q.setName)+'</span><span class="rule">'+esc(q.rule)+'</span><span class="qnum">'+(i+1)+'/'+deck.length+'</span></div>';
+    html+='<p class="sentence">'+esc(q.a)+'<span class="blank">____</span>'+esc(q.b)+'</p>';
+    html+='<div class="opts">';
+    for(var o=0;o<q.options.length;o++){
+      html+='<button class="opt" data-i="'+o+'"><span class="opt-mark">'+MARKS[o]+'</span><span class="opt-text">'+esc(q.options[o])+'</span><span class="opt-badge">'+(o===q.answerIdx?"정답":"오답")+'</span></button>';
+    }
+    html+='</div>';
+    html+='<div class="explain"><b></b>'+esc(q.why)+'</div>';
+    html+='</section>';
+  }
+  document.getElementById("stage").innerHTML=html;
+
+  var cards=document.getElementById("stage").getElementsByClassName("card");
+  for(var c=0;c<cards.length;c++){
+    (function(card){
+      var ans=parseInt(card.getAttribute("data-ans"),10);
+      var opts=card.getElementsByClassName("opt");
+      var blank=card.getElementsByClassName("blank")[0];
+      var correctText=card.getElementsByClassName("opt-text")[ans].textContent;
+      var explain=card.getElementsByClassName("explain")[0];
+      var answered=false;
+      for(var o=0;o<opts.length;o++){
+        (function(btn,idx){
+          btn.onclick=function(){
+            if(answered) return; answered=true;
+            for(var m=0;m<opts.length;m++){
+              if(m===ans) opts[m].className="opt correct";
+              else if(m===idx) opts[m].className="opt wrong";
+              else opts[m].className="opt dim";
+            }
+            blank.textContent=correctText; blank.className="blank filled";
+            var good=idx===ans;
+            explain.className="explain show"+(good?"":" bad");
+            explain.getElementsByTagName("b")[0].textContent=good?"정답이에요! ":"아쉬워요. ";
+          };
+        })(opts[o],o);
+      }
+    })(cards[c]);
+  }
+}
+
+document.getElementById("shuffleBtn").onclick=function(){ render(); window.scrollTo(0,0); };
+document.getElementById("resetBtn").onclick=function(){ render(); };
+render();
+</script>
+</body>
+</html>
